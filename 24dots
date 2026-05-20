@@ -1,0 +1,122 @@
+#!/bin/sh
+# /usr/local/bin/24dots
+# Prints one line per font/CPI combination for visual comparison.
+#
+# 24dots -- Prints one line per font/CPI combination for visual comparison.
+# Copyright (C) 2026  Dillon Feeney.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# See the COPYING file for licence details.
+#
+# Created: 2026-05-20
+# Updated: 2026-05-20
+# Changelog:
+# 2026-05-20
+# Added:
+# - Initial script
+
+PRINTER=LQ590_text
+
+{
+    printf '\x1B@'          # reset
+    printf '\x1Bx\x01'      # LQ mode
+    printf '\x1BP'          # 10 cpi (initial)
+
+    # Header
+    printf '....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8\r\n'
+    printf 'LQ-590II font/pitch sample -- 9.5x11 fanfold -- 6 LPI\r\n'
+    printf '\r\n'
+
+    # Roman
+    printf '\x1Bk\x00\x1BP'   ; printf 'Roman      10 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x00\x1BM'   ; printf 'Roman      12 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x00\x1Bg'   ; printf 'Roman      15 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x00\x0F'    ; printf 'Roman      17 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x12'             # cancel condensed
+    printf '\x1Bk\x00\x1B\x0F'; printf 'Roman      20 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x12'
+    printf '\x1Bk\x00\x1Bp\x01\x1BP'; printf 'Roman      PS      ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bp\x00'        # cancel proportional
+
+    # Sans Serif
+    printf '\x1Bk\x01\x1BP'   ; printf 'Sans Serif 10 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x01\x1BM'   ; printf 'Sans Serif 12 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x01\x1Bg'   ; printf 'Sans Serif 15 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x01\x0F'    ; printf 'Sans Serif 17 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x12'
+    printf '\x1Bk\x01\x1B\x0F'; printf 'Sans Serif 20 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x12'
+    printf '\x1Bk\x01\x1Bp\x01\x1BP'; printf 'Sans Serif PS      ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bp\x00'
+
+    # Courier
+    printf '\x1Bk\x02\x1BP'   ; printf 'Courier    10 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x02\x1BM'   ; printf 'Courier    12 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x02\x1Bg'   ; printf 'Courier    15 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x02\x0F'    ; printf 'Courier    17 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x12'
+    printf '\x1Bk\x02\x1B\x0F'; printf 'Courier    20 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x12'
+    printf '\x1Bk\x02\x1Bp\x01\x1BP'; printf 'Courier    PS      ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bp\x00'
+
+    # Prestige (no 15 cpi)
+    printf '\x1Bk\x03\x1BP'   ; printf 'Prestige   10 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x03\x1BM'   ; printf 'Prestige   12 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x03\x0F'    ; printf 'Prestige   17 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x12'
+    printf '\x1Bk\x03\x1B\x0F'; printf 'Prestige   20 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x12'
+    printf '\x1Bk\x03\x1Bp\x01\x1BP'; printf 'Prestige   PS      ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bp\x00'
+
+    # Script (no 15 cpi)
+    printf '\x1Bk\x04\x1BP'   ; printf 'Script     10 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x04\x1BM'   ; printf 'Script     12 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x04\x0F'    ; printf 'Script     17 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x12'
+    printf '\x1Bk\x04\x1B\x0F'; printf 'Script     20 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x12'
+    printf '\x1Bk\x04\x1Bp\x01\x1BP'; printf 'Script     PS      ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bp\x00'
+
+    # Draft modes
+    printf '\x1Bx\x00'        # draft mode
+    printf '\x1Bk\x00\x1BP'   ; printf 'Draft      10 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x00\x1BM'   ; printf 'Draft      12 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x00\x1Bg'   ; printf 'Draft      15 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x00\x0F'    ; printf 'Draft      17 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x12'
+    printf '\x1Bk\x00\x1B\x0F'; printf 'Draft      20 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x12'
+
+    # HSD
+    printf '\x1Bx\x00'
+    printf '\x1Bk\x00\x1BP'   ; printf 'HSD        10 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+    printf '\x1Bk\x00\x1BM'   ; printf 'HSD        12 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+
+    # USD
+    printf '\x1Bk\x00\x1BP'   ; printf 'USD        10 cpi  ABCDEFGHIJ abcdefghij 0123456789 !@#$%%^&*()\r\n'
+
+    # Reset and a vertical ruler for bottom-margin measurement
+    printf '\x1B@'            # reset
+    printf '\x1BP'            # 10 cpi
+    printf '\r\n'
+    printf -- '-- end of font samples; lines below mark distance to perforation --\r\n'
+    for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+        printf 'line %02d of bottom-margin ruler\r\n' $i
+    done
+
+    # NO form feed -- leave paper in place for measurement
+} | lp -d "$PRINTER"
