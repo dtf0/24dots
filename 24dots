@@ -29,12 +29,15 @@ reset_printer() { printf '\033@'; }
 lq_mode()       { printf '\033x\001'; }
 draft_mode()    { printf '\033x\000'; }
 font()          { printf '\033k'; printf "\\$(printf '%03o' "$1")"; }
-pitch_10()      { printf '\033P'; }
-pitch_12()      { printf '\033M'; }
-pitch_15()      { printf '\033g'; }
-pitch_17()      { printf '\017'; }
-pitch_20()      { printf '\033\017'; }
-cancel_cond()   { printf '\022'; }
+
+# Pitch helpers -- each cancels condensed mode first, then sets the
+# correct base pitch (and re-applies condensed where needed).
+pitch_10()      { printf '\022\033P'; }
+pitch_12()      { printf '\022\033M'; }
+pitch_15()      { printf '\022\033g'; }
+pitch_17()      { printf '\022\033P\017'; }
+pitch_20()      { printf '\022\033M\017'; }
+
 ps_on()         { printf '\033p\001'; }
 ps_off()        { printf '\033p\000'; }
 
@@ -58,7 +61,7 @@ line() {
     printf -- 'LQ-590II font and pitch sample -- 9.5x11 fanfold -- 6 LPI\r\n'
     printf -- '\r\n'
 
-    # LQ fonts: Roman, Sans Serif, Courier (all five pitches + PS)
+    # LQ fonts with all five pitches + PS: Roman, Sans Serif, Courier
     for f in 0 1 2; do
         case $f in
             0) name="Roman" ;;
@@ -68,8 +71,8 @@ line() {
         font $f; pitch_10;  line "$name 10 cpi"
         font $f; pitch_12;  line "$name 12 cpi"
         font $f; pitch_15;  line "$name 15 cpi"
-        font $f; pitch_17;  line "$name 17 cpi"; cancel_cond
-        font $f; pitch_20;  line "$name 20 cpi"; cancel_cond
+        font $f; pitch_17;  line "$name 17 cpi"
+        font $f; pitch_20;  line "$name 20 cpi"
         font $f; ps_on; pitch_10; line "$name PS"; ps_off
     done
 
@@ -81,18 +84,19 @@ line() {
         esac
         font $f; pitch_10;  line "$name 10 cpi"
         font $f; pitch_12;  line "$name 12 cpi"
-        font $f; pitch_17;  line "$name 17 cpi"; cancel_cond
-        font $f; pitch_20;  line "$name 20 cpi"; cancel_cond
+        font $f; pitch_17;  line "$name 17 cpi"
+        font $f; pitch_20;  line "$name 20 cpi"
         font $f; ps_on; pitch_10; line "$name PS"; ps_off
     done
 
-    # Draft mode at all five pitches.
+    # Draft mode at all five pitches. Speed (Normal / HSD / USD)
+    # depends on the panel Font button selection at runtime.
     draft_mode
     font 0; pitch_10;  line "Draft 10 cpi"
     font 0; pitch_12;  line "Draft 12 cpi"
     font 0; pitch_15;  line "Draft 15 cpi"
-    font 0; pitch_17;  line "Draft 17 cpi"; cancel_cond
-    font 0; pitch_20;  line "Draft 20 cpi"; cancel_cond
+    font 0; pitch_17;  line "Draft 17 cpi"
+    font 0; pitch_20;  line "Draft 20 cpi"
 
     # Reset and bottom ruler for margin measurement
     reset_printer
@@ -100,9 +104,11 @@ line() {
     pitch_10
     printf -- '\r\n'
     printf -- '-- end of font samples; ruler below marks distance to perforation --\r\n'
-    for i in $(seq 1 24); do
+    for i in $(seq 1 21); do
         printf -- 'ruler line %02d\r\n' "$i"
     done
 
     # No form feed -- leaves paper in place for measurement.
+    # Press Tear Off/Bin on the printer to advance for tear-off,
+    # or enable Auto tear off in Default Settings for automatic advance.
 } | lp -d "$PRINTER"
