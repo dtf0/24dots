@@ -50,8 +50,11 @@ line() {
     lq_mode
     pitch_10
 
-    # Header / column ruler at 10 cpi
+    # Column rulers -- 10 cpi (80 cols) then 20 cpi (160 cols)
     printf -- '....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8\r\n'
+    pitch_20
+    printf -- '....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10....+...11....+...12....+...13....+...14....+...15....+...16\r\n'
+    pitch_10
     printf -- 'LQ-590II font and pitch sample -- 9.5x11 fanfold -- 6 LPI\r\n'
     printf -- '\r\n'
 
@@ -83,8 +86,7 @@ line() {
         font $f; ps_on; pitch_10; line "$name PS"; ps_off
     done
 
-    # Draft mode at all five pitches (panel must be set to Draft for normal draft;
-    # set panel to HSD or USD before running to test those)
+    # Draft mode at all five pitches.
     draft_mode
     font 0; pitch_10;  line "Draft 10 cpi"
     font 0; pitch_12;  line "Draft 12 cpi"
@@ -92,15 +94,15 @@ line() {
     font 0; pitch_17;  line "Draft 17 cpi"; cancel_cond
     font 0; pitch_20;  line "Draft 20 cpi"; cancel_cond
 
-    # Reset and bottom ruler
+    # Reset and bottom ruler for margin measurement
     reset_printer
     lq_mode
     pitch_10
     printf -- '\r\n'
     printf -- '-- end of font samples; ruler below marks distance to perforation --\r\n'
-    for i in $(seq 1 23); do
+    for i in $(seq 1 24); do
         printf -- 'ruler line %02d\r\n' "$i"
     done
 
-    # No form feed -- leave paper in place for measurement.
+    # No form feed -- leaves paper in place for measurement.
 } | lp -d "$PRINTER"
