@@ -21,93 +21,86 @@
 #
 # Created: 2026-05-20
 # Updated: 2026-05-20
-# Changelog:
-# 2026-05-20
-# Added:
-# - Initial script
-# - font() implementation
-# Changed:
-# - Switch to bash, add variables, update printf calls
-# - String-variable approach
 
 PRINTER=LQ590_text
 
-# Helper: emit ESC/P 2 commands via printf with octal escapes.
-esc()       { printf '\033@'; }                    # reset
-lq()        { printf '\033x\001'; }                # LQ mode
-draft()     { printf '\033x\000'; }                # draft mode
-font()      { printf '\033k\%03o' "$1"; }          # select font n (0-7) -- BROKEN
-pitch10()   { printf '\033P'; }
-pitch12()   { printf '\033M'; }
-pitch15()   { printf '\033g'; }
-pitch17()   { printf '\017'; }                     # SI
-pitch20()   { printf '\033\017'; }
-cancel_cond() { printf '\022'; }                   # DC2
-ps_on()     { printf '\033p\001'; }
-ps_off()    { printf '\033p\000'; }
+# Helpers
+reset_printer() { printf '\033@'; }
+lq_mode()       { printf '\033x\001'; }
+draft_mode()    { printf '\033x\000'; }
+font()          { printf '\033k'; printf "\\$(printf '%03o' "$1")"; }
+pitch_10()      { printf '\033P'; }
+pitch_12()      { printf '\033M'; }
+pitch_15()      { printf '\033g'; }
+pitch_17()      { printf '\017'; }
+pitch_20()      { printf '\033\017'; }
+cancel_cond()   { printf '\022'; }
+ps_on()         { printf '\033p\001'; }
+ps_off()        { printf '\033p\000'; }
 
 SAMPLE='ABCDEFGHIJ abcdefghij 0123456789 !@#$%^&*()'
 
-sample_line() {
+line() {
     local label=$1
-    printf -- '%-18s %s\r\n' "$label" "$SAMPLE"
+    printf -- '%-22s %s\r\n' "$label" "$SAMPLE"
 }
 
 {
-    esc; lq; pitch10
+    reset_printer
+    lq_mode
+    pitch_10
+
+    # Header / column ruler at 10 cpi
     printf -- '....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8\r\n'
-    printf -- 'LQ-590II font/pitch sample\r\n\r\n'
+    printf -- 'LQ-590II font and pitch sample -- 9.5x11 fanfold -- 6 LPI\r\n'
+    printf -- '\r\n'
 
-    # Roman (font 0)
-    font 0; pitch10; sample_line "Roman 10 cpi"
-    font 0; pitch12; sample_line "Roman 12 cpi"
-    font 0; pitch15; sample_line "Roman 15 cpi"
-    font 0; pitch17; sample_line "Roman 17 cpi"; cancel_cond
-    font 0; pitch20; sample_line "Roman 20 cpi"; cancel_cond
-    font 0; ps_on; pitch10; sample_line "Roman PS"; ps_off
-
-    # Sans Serif (font 1)
-    font 1; pitch10; sample_line "Sans Serif 10 cpi"
-    font 1; pitch12; sample_line "Sans Serif 12 cpi"
-    font 1; pitch15; sample_line "Sans Serif 15 cpi"
-    font 1; pitch17; sample_line "Sans Serif 17 cpi"; cancel_cond
-    font 1; pitch20; sample_line "Sans Serif 20 cpi"; cancel_cond
-    font 1; ps_on; pitch10; sample_line "Sans Serif PS"; ps_off
-
-    # Courier (font 2)
-    font 2; pitch10; sample_line "Courier 10 cpi"
-    font 2; pitch12; sample_line "Courier 12 cpi"
-    font 2; pitch15; sample_line "Courier 15 cpi"
-    font 2; pitch17; sample_line "Courier 17 cpi"; cancel_cond
-    font 2; pitch20; sample_line "Courier 20 cpi"; cancel_cond
-    font 2; ps_on; pitch10; sample_line "Courier PS"; ps_off
-
-    # Prestige (font 3) -- no 15 cpi
-    font 3; pitch10; sample_line "Prestige 10 cpi"
-    font 3; pitch12; sample_line "Prestige 12 cpi"
-    font 3; pitch17; sample_line "Prestige 17 cpi"; cancel_cond
-    font 3; pitch20; sample_line "Prestige 20 cpi"; cancel_cond
-    font 3; ps_on; pitch10; sample_line "Prestige PS"; ps_off
-
-    # Script (font 4) -- no 15 cpi
-    font 4; pitch10; sample_line "Script 10 cpi"
-    font 4; pitch12; sample_line "Script 12 cpi"
-    font 4; pitch17; sample_line "Script 17 cpi"; cancel_cond
-    font 4; pitch20; sample_line "Script 20 cpi"; cancel_cond
-    font 4; ps_on; pitch10; sample_line "Script PS"; ps_off
-
-    # Draft modes
-    draft
-    font 0; pitch10; sample_line "Draft 10 cpi"
-    font 0; pitch12; sample_line "Draft 12 cpi"
-    font 0; pitch15; sample_line "Draft 15 cpi"
-    font 0; pitch17; sample_line "Draft 17 cpi"; cancel_cond
-    font 0; pitch20; sample_line "Draft 20 cpi"; cancel_cond
-
-    # Reset and ruler
-    esc; lq; pitch10
-    printf -- '\r\n-- end of font samples; lines below mark distance to perforation --\r\n'
-    for i in $(seq 1 20); do
-        printf -- 'line %02d of bottom-margin ruler\r\n' "$i"
+    # LQ fonts: Roman, Sans Serif, Courier (all five pitches + PS)
+    for f in 0 1 2; do
+        case $f in
+            0) name="Roman" ;;
+            1) name="Sans Serif" ;;
+            2) name="Courier" ;;
+        esac
+        font $f; pitch_10;  line "$name 10 cpi"
+        font $f; pitch_12;  line "$name 12 cpi"
+        font $f; pitch_15;  line "$name 15 cpi"
+        font $f; pitch_17;  line "$name 17 cpi"; cancel_cond
+        font $f; pitch_20;  line "$name 20 cpi"; cancel_cond
+        font $f; ps_on; pitch_10; line "$name PS"; ps_off
     done
+
+    # LQ fonts without 15 cpi: Prestige, Script
+    for f in 3 4; do
+        case $f in
+            3) name="Prestige" ;;
+            4) name="Script" ;;
+        esac
+        font $f; pitch_10;  line "$name 10 cpi"
+        font $f; pitch_12;  line "$name 12 cpi"
+        font $f; pitch_17;  line "$name 17 cpi"; cancel_cond
+        font $f; pitch_20;  line "$name 20 cpi"; cancel_cond
+        font $f; ps_on; pitch_10; line "$name PS"; ps_off
+    done
+
+    # Draft mode at all five pitches (panel must be set to Draft for normal draft;
+    # set panel to HSD or USD before running to test those)
+    draft_mode
+    font 0; pitch_10;  line "Draft 10 cpi"
+    font 0; pitch_12;  line "Draft 12 cpi"
+    font 0; pitch_15;  line "Draft 15 cpi"
+    font 0; pitch_17;  line "Draft 17 cpi"; cancel_cond
+    font 0; pitch_20;  line "Draft 20 cpi"; cancel_cond
+
+    # Reset and bottom ruler
+    reset_printer
+    lq_mode
+    pitch_10
+    printf -- '\r\n'
+    printf -- '-- end of font samples; ruler below marks distance to perforation --\r\n'
+    for i in $(seq 1 23); do
+        printf -- 'ruler line %02d\r\n' "$i"
+    done
+
+    # No form feed -- leave paper in place for measurement.
 } | lp -d "$PRINTER"
