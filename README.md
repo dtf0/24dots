@@ -16,8 +16,8 @@ the operator can:
 - Verify all internal fonts and pitches render correctly
 - Compare typeface, weight, and quality of each font visually
 - Confirm that ESC/P 2 command transmission through CUPS is intact
-- Measure where text lands relative to the top and bottom perforations
-  for margin calibration
+- Measure where text lands relative to the top and bottom perforations for
+  margin calibration
 
 ## Requirements
 
@@ -59,9 +59,8 @@ sudo cp 24dots.v6.sh /usr/local/bin/24dots
 sudo chmod +x /usr/local/bin/24dots
 ```
 
-The script targets a CUPS queue named "LQ590_text" by default.  If the
-queue is named differently, edit the PRINTER variable near the top of
-the script.
+The script targets a CUPS queue named "LQ590_text" by default.  If the queue is
+named differently, edit the PRINTER variable near the top of the script.
 
 ## Usage
 
@@ -72,11 +71,10 @@ top-of-form.  Run:
 24dots
 ```
 
-The script prints continuously and does not advance to the next page
-when finished.  Paper is left positioned at the last printed line so
-the bottom-margin measurement can be taken.  Press Tear Off/Bin on the
-printer (or wait for Auto tear off to fire) to advance the page for
-tearing.
+The script prints continuously and does not advance to the next page when
+finished.  Paper is left positioned at the last printed line so the
+bottom-margin measurement can be taken.  Press Tear Off/Bin on the printer (or
+wait for Auto tear off to fire) to advance the page for tearing.
 
 ## Output layout
 
@@ -105,36 +103,32 @@ giving symmetric top and bottom margins on standard 11-inch fanfold.
 Each printed line should appear in a visibly distinct typeface and
 pitch.  Expected observations:
 
-  - Within each font, characters get narrower as cpi increases.
-    10 cpi is widest, 20 cpi narrowest.
-  - 15 cpi and 17 cpi look similar but not identical (15 cpi is
-    proportionally wider).
-  - PS (proportional) shows variable character widths -- 'i' narrower
-    than 'W'.
-  - Roman is a serif typeface; Sans Serif has no serifs; Courier is
-    monospace with serifs; Prestige is a slab serif; Script is cursive.
+  - Within each font, characters get narrower as cpi increases.  10 cpi is
+    widest, 20 cpi narrowest.
+  - 15 cpi and 17 cpi look similar but not identical (15 cpi is proportionally
+    wider).
+  - PS (proportional) shows variable character widths -- 'i' narrower than 'W'.
+  - Roman is a serif typeface; Sans Serif has no serifs; Courier is monospace
+    with serifs; Prestige is a slab serif; Script is cursive.
   - Draft lines print noticeably faster and lighter than LQ lines.
 
 Common anomalies that indicate a configuration issue:
 
-  - All pitches within a font appear identical:  the printer is
-    collapsing condensed modes (firmware issue or wrong base pitch
-    sequence -- v4 of the script had this problem before v6 corrected
-    it).
-  - All fonts look like Roman:  ESC k commands are not reaching the
-    printer.  Check the queue is raw and not filtering.
-  - Letters appear at the start of lines (e.g. "PRoman 10 cpi"):  the
-    ESC byte is being stripped from font/pitch commands.  Check shell
-    is bash, not dash.
-  - "000Roman" or similar numeric prefix:  a broken font helper that
-    emits an octal digit string rather than the byte (v3 issue).
+  - All pitches within a font appear identical: the printer is collapsing
+    condensed modes (firmware issue or wrong base pitch sequence -- v4 of the
+    script had this problem before v6 corrected it).
+  - All fonts look like Roman: ESC k commands are not reaching the printer.
+    Check the queue is raw and not filtering.
+  - Letters appear at the start of lines (e.g. "PRoman 10 cpi"): the ESC byte is
+    being stripped from font/pitch commands.  Check shell is bash, not dash.
+  - "000Roman" or similar numeric prefix: a broken font helper that emits an
+    octal digit string rather than the byte (v3 issue).
 
 ## Testing draft sub-modes (USD, HSD)
 
-The Draft block at the end of the page uses ESC x 0 to enter draft
-quality.  The actual speed within draft mode (Normal Draft, HSD, or
-USD) is controlled by the printer's panel Font button, not by ESC/P 2
-commands.
+The Draft block at the end of the page uses ESC x 0 to enter draft quality.  The
+actual speed within draft mode (Normal Draft, HSD, or USD) is controlled by the
+printer's panel Font button, not by ESC/P 2 commands.
 
 To compare all three:
 
@@ -143,8 +137,8 @@ To compare all three:
   2. Set panel Font to HSD, run again, label "HSD"
   3. Set panel Font to USD, run again, label "USD"
 
-The Draft block lines will print in whatever speed is currently
-selected on the panel.
+The Draft block lines will print in whatever speed is currently selected on the
+panel.
 
 ## ESC/P 2 command reference
 
