@@ -24,97 +24,127 @@
 # Page length must be set to 11 inches in Default Settings.
 # 9.5x11 fanfold, rear push tractor, 6 LPI.
 
-PRINTER=LQ590_text
+set -euo pipefail
 
-# Helpers
+# ----- Configuration ----------------------------------------------------------
+
+PRINTER="${LQ590_PRINTER:-LQ590_text}"
+LABEL_WIDTH=22
+RULER_LINES=18
+SAMPLE='ABCDEFGHIJ abcdefghij 0123456789 !@#$%^&*()'
+
+# ----- ESC/P 2 command primitives --------------------------------------------
+
 reset_printer() { printf '\033@'; }
 lq_mode()       { printf '\033x\001'; }
 draft_mode()    { printf '\033x\000'; }
-font()          { printf '\033k'; printf "\\$(printf '%03o' "$1")"; }
+ps_on()         { printf '\033p\001'; }
+ps_off()        { printf '\033p\000'; }
 
-# Pitch helpers -- each cancels condensed mode first, then sets the
-# correct base pitch (and re-applies condensed where needed).
+# Pitch helpers cancel condensed mode (DC2) first, then set base pitch,
+# re-applying condensed (SI) where the effective cpi requires it.
 pitch_10()      { printf '\022\033P'; }
 pitch_12()      { printf '\022\033M'; }
 pitch_15()      { printf '\022\033g'; }
 pitch_17()      { printf '\022\033P\017'; }
 pitch_20()      { printf '\022\033M\017'; }
 
-ps_on()         { printf '\033p\001'; }
-ps_off()        { printf '\033p\000'; }
-
-SAMPLE='ABCDEFGHIJ abcdefghij 0123456789 !@#$%^&*()'
-
-line() {
-    local label=$1
-    printf -- '%-22s %s\r\n' "$label" "$SAMPLE"
+# Font selection -- case statement avoids a subshell per call.
+# Each branch emits a literal octal escape that printf interprets as one byte.
+font() {
+    printf '\033k'
+    case "$1" in
+        0) printf '\000' ;;
+        1) printf '\001' ;;
+        2) printf '\002' ;;
+        3) printf '\003' ;;
+        4) printf '\004' ;;
+        5) printf '\005' ;;
+        6) printf '\006' ;;
+        7) printf '\007' ;;
+        *) return 1 ;;
+    esac
 }
 
-{
-    reset_printer
-    lq_mode
-    pitch_10
+# ----- Output helpers ---------------------------------------------------------
 
-    # Column rulers -- 10 cpi (80 cols) then 20 cpi (160 cols)
-    printf -- '....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8\r\n'
-    printf -- '....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0\r\n'
-    printf -- '^^Header / column ruler at 10 CPI ^^\r\n'
-    pitch_20
-    printf -- '....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10....+...11....+...12....+...13....+...14....+...15....+...16\r\n'
-    printf -- '....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0\r\n'
-    printf -- '^^Header / column ruler at 20 CPI ^^\r\n'
-    pitch_10
-    printf -- 'LQ-590II font and pitch sample -- 9.5x11 fanfold -- 6 LPI\r\n'
-    printf -- '\r\n'
+line() {
+    printf -- '%-*s %s\r\n' "$LABEL_WIDTH" "$1" "$SAMPLE"
+}
 
-    # LQ fonts with all five pitches + PS: Roman, Sans Serif, Courier
-    for f in 0 1 2; do
-        case $f in
-            0) name="Roman" ;;
-            1) name="Sans Serif" ;;
-            2) name="Courier" ;;
-        esac
-        font $f; pitch_10;  line "$name 10 cpi"
-        font $f; pitch_12;  line "$name 12 cpi"
-        font $f; pitch_15;  line "$name 15 cpi"
-        font $f; pitch_17;  line "$name 17 cpi"
-        font $f; pitch_20;  line "$name 20 cpi"
-        font $f; ps_on; pitch_10; line "$name PS"; ps_off
+ruler_segment() {
+    local padded
+    printf -v padded '%5s' "$1"
+    printf '....+%s' "${padded// /.}"
+}
+
+ruler() {
+    local count=$1 label=$2 i
+    for ((i = 1; i <= count; i++)); do ruler_segment "$i"; done
+    printf '\r\n'
+    for ((i = 1; i <= count; i++)); do ruler_segment 0;    done
+    printf '\r\n'
+    printf -- '%s\r\n' "$label"
+}
+
+ruler_10cpi() { ruler 8  "Column ruler at 10 CPI"; }
+ruler_20cpi() { ruler 16 "Column ruler at 20 CPI"; }
+
+# Print all listed pitches for one font.
+# Args: font_num label pitch [pitch ...]
+# Pitches: 10 12 15 17 20 ps
+print_pitches() {
+    local fnum=$1 label=$2
+    shift 2
+    local pitch
+    for pitch in "$@"; do
+        if [[ "$pitch" == "ps" ]]; then
+            font "$fnum"; ps_on; pitch_10; line "$label PS"; ps_off
+        else
+            font "$fnum"; "pitch_$pitch"; line "$label $pitch cpi"
+        fi
     done
+}
 
-    # LQ fonts without 15 cpi: Prestige, Script
-    for f in 3 4; do
-        case $f in
-            3) name="Prestige" ;;
-            4) name="Script" ;;
-        esac
-        font $f; pitch_10;  line "$name 10 cpi"
-        font $f; pitch_12;  line "$name 12 cpi"
-        font $f; pitch_17;  line "$name 17 cpi"
-        font $f; pitch_20;  line "$name 20 cpi"
-        font $f; ps_on; pitch_10; line "$name PS"; ps_off
-    done
+# ----- Main -------------------------------------------------------------------
 
-    # Draft mode at all five pitches. Speed (Normal / HSD / USD)
-    # depends on the panel Font button selection at runtime.
-    draft_mode
-    font 0; pitch_10;  line "Draft 10 cpi"
-    font 0; pitch_12;  line "Draft 12 cpi"
-    font 0; pitch_15;  line "Draft 15 cpi"
-    font 0; pitch_17;  line "Draft 17 cpi"
-    font 0; pitch_20;  line "Draft 20 cpi"
+main() {
+    if ! lpstat -p "$PRINTER" >/dev/null 2>&1; then
+        printf 'error: CUPS queue %q not found\n' "$PRINTER" >&2
+        printf '       set LQ590_PRINTER to override the default\n' >&2
+        return 1
+    fi
 
-    # Reset and bottom ruler for margin measurement
-    reset_printer
-    lq_mode
-    pitch_10
-    printf -- '\r\n'
-    printf -- '-- end of font samples; ruler below marks distance to perforation --\r\n'
-    for i in $(seq 1 18); do
-        printf -- 'ruler line %02d\r\n' "$i"
-    done
+    {
+        reset_printer
+        lq_mode
+        pitch_10
 
-    # No form feed -- leaves paper in place for measurement.
-    # Press Tear Off/Bin on the printer to advance for tear-off,
-    # or enable Auto tear off in Default Settings for automatic advance.
-} | lp -d "$PRINTER"
+        ruler_10cpi
+        pitch_20; ruler_20cpi
+        pitch_10
+        printf -- 'LQ-590II font and pitch sample -- 9.5x11 fanfold -- 6 LPI\r\n\r\n'
+
+        print_pitches 0 "Roman"      10 12 15 17 20 ps
+        print_pitches 1 "Sans Serif" 10 12 15 17 20 ps
+        print_pitches 2 "Courier"    10 12 15 17 20 ps
+        print_pitches 3 "Prestige"   10 12    17 20 ps
+        print_pitches 4 "Script"     10 12    17 20 ps
+
+        draft_mode
+        print_pitches 0 "Draft"      10 12 15 17 20
+
+        reset_printer
+        lq_mode
+        pitch_10
+        printf -- '\r\n'
+        printf -- '-- end of font samples; ruler below marks distance to perforation --\r\n'
+
+        local i
+        for ((i = 1; i <= RULER_LINES; i++)); do
+            printf -- 'ruler line %02d\r\n' "$i"
+        done
+    } | lp -d "$PRINTER"
+}
+
+main "$@"
