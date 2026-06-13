@@ -76,7 +76,11 @@ finished.  Paper is left positioned at the last printed line so the
 bottom-margin measurement can be taken.  Press Tear Off/Bin on the printer (or
 wait for Auto tear off to fire) to advance the page for tearing.
 
-## Output layout
+## Output
+
+![Scan of tractor-feed paper with this script's output printed on it.](/output.jpg)
+
+### Output layout
 
 The printed page contains:
 
@@ -98,7 +102,7 @@ Total:  60 lines = 10 inches at 6 LPI.  With the 1/2 inch top-of-form
 offset, the last ruler line lands 1/2 inch above the next perforation,
 giving symmetric top and bottom margins on standard 11-inch fanfold.
 
-## Interpreting the output
+### Interpreting the output
 
 Each printed line should appear in a visibly distinct typeface and
 pitch.  Expected observations:
@@ -124,7 +128,7 @@ Common anomalies that indicate a configuration issue:
   - "000Roman" or similar numeric prefix: a broken font helper that emits an
     octal digit string rather than the byte (v3 issue).
 
-## Testing draft sub-modes (USD, HSD)
+### Testing draft sub-modes (USD, HSD)
 
 The Draft block at the end of the page uses ESC x 0 to enter draft quality.  The
 actual speed within draft mode (Normal Draft, HSD, or USD) is controlled by the
