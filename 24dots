@@ -1,8 +1,5 @@
 #!/bin/bash
-# /usr/local/bin/24dots
-# Prints one line per font/CPI combination for visual comparison.
-#
-# 24dots -- Prints one line per font/CPI combination for visual comparison.
+# 24dots -- Prints LQ-590II font and pitch samples on one page.
 # Copyright (C) 2026  Dillon Feeney.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,6 +18,11 @@
 #
 # Created: 2026-05-20
 # Updated: 2026-05-20
+#
+# Notes:
+# Top-of-form must be set to 1/2 inch via Micro Adjust before running.
+# Page length must be set to 11 inches in Default Settings.
+# 9.5x11 fanfold, rear push tractor, 6 LPI.
 
 PRINTER=LQ590_text
 
@@ -55,8 +57,12 @@ line() {
 
     # Column rulers -- 10 cpi (80 cols) then 20 cpi (160 cols)
     printf -- '....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8\r\n'
+    printf -- '....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0\r\n'
+    printf -- '^^Header / column ruler at 10 CPI ^^\r\n'
     pitch_20
     printf -- '....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10....+...11....+...12....+...13....+...14....+...15....+...16\r\n'
+    printf -- '....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0....+....0\r\n'
+    printf -- '^^Header / column ruler at 20 CPI ^^\r\n'
     pitch_10
     printf -- 'LQ-590II font and pitch sample -- 9.5x11 fanfold -- 6 LPI\r\n'
     printf -- '\r\n'
@@ -104,7 +110,7 @@ line() {
     pitch_10
     printf -- '\r\n'
     printf -- '-- end of font samples; ruler below marks distance to perforation --\r\n'
-    for i in $(seq 1 21); do
+    for i in $(seq 1 18); do
         printf -- 'ruler line %02d\r\n' "$i"
     done
 
