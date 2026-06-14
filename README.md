@@ -48,13 +48,13 @@ Printer configuration (set once via the front panel):
 Save the script as `/usr/local/bin/24dots` and make it
 executable:
 
-```
+```sh
 sudo install -m 755 24dots /usr/local/bin/24dots
 ```
 
 Or copy and chmod manually:
 
-```
+```sh
 sudo cp 24dots.v6.sh /usr/local/bin/24dots
 sudo chmod +x /usr/local/bin/24dots
 ```
@@ -209,7 +209,44 @@ five distinct widths regardless of prior state.
   layout will beoff vertically but still readable.
 - Bash-only.  Will not run under dash or POSIX sh.
 
-## `24dots_functions.sh`
+## Other scripts available
+
+### `24dots_banner.py`
+
+Remember the '90s?  When every office party, bake sale, and surprise
+leaving-do was announced by a six-foot strip of fanfold paper that took the
+dot-matrix a full tea break to grind out, tractor holes still attached?  This
+brings that back -- ribbon screech and all.
+
+This script prints a string as a large banner on continuous-feed paper using an
+Epson LQ-590II (or any ESC/P 2 printer).  The text is rendered with a scalable
+font, rotated ninety degrees, and sent as 24-pin bit-image graphics, so each
+character is as tall as the printable paper width and the banner runs along the
+length of the feed.  This is the only way to reach that size: the printer's
+built-in fonts scale no larger than about half an inch.  It needs Python 3,
+Pillow, and NumPy, plus a CUPS queue for the printer.  Run it by piping its
+output to `lp`:
+
+```sh
+python3 banner.py "Your text" | lp -d LQ590_text -o raw
+```
+
+Replace `LQ590_text` with your own queue name; `lpstat -p` lists them and
+`lpstat -d` shows the default.  Ink weight is set with the `BANNER_DENSITY`
+environment variable, which takes a named level -- `full`, `half`, `light`, or
+`lighter` -- or any fraction such as `0.35`; lower values thin the dots through
+an ordered-dither mask and print faster.  Before committing to paper, pass
+`--preview out.png` to write the bitmap to a file instead of printing it.  Three
+further variables tune the layout: `BANNER_WIDTH_IN` for the printable width in
+inches (default 8.0), `BANNER_MARGIN_IN` for the blank margin on each side
+(default 0.25), and `BANNER_FONT` for the path to a TrueType or OpenType face
+(default DejaVu Sans Bold).
+
+```sh
+BANNER_DENSITY=0.1 python3 banner.py "Your text" --preview out.png
+```
+
+### `24dots_functions.sh`
 
 Printing helpers (ESC/P + CUPS).  Requires `$PRINTER` to name a valid lp
 destination.  Source this file from `~/.bashrc` (or `~/.profile`) to load:
