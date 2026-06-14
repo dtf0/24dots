@@ -2,7 +2,7 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: 24dots
 Source: https://github.com/dtf0/24dots
 
-Files: 24dots
+Files: *
 Copyright: 2026  Dillon Feeney.
 License: GPL-3+
 

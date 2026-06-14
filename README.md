@@ -209,6 +209,35 @@ five distinct widths regardless of prior state.
   layout will beoff vertically but still readable.
 - Bash-only.  Will not run under dash or POSIX sh.
 
+## `24dots_functions.sh`
+
+Printing helpers (ESC/P + CUPS).  Require `$PRINTER` to name a valid lp
+destination.  Source this file from ~/.bashrc (or ~/.profile) to load:
+```sh
+[ -f ~/.shell_functions ] && . ~/.shell_functions
+```
+Both functions depend on: fmt, lp (CUPS).  print_explicit assumes the target
+printer understands ESC/P control codes.
+
+Notes:
+Define $PRINTER before or alongside these functions, for example:
+```sh
+export PRINTER=office
+```
+in the same file or in your environment setup.
+
+After editing the sourced file, reload it with:
+```sh
+. path/to/24dots_functions.sh
+```
+or open a new shell.
+
+Confirm loading with:
+```sh
+declare -F print_panel print_explicit
+```
+which lists the names if defined.
+
 ## See also
 
 - Epson LQ-590II User's Guide (NPD5799-02 EN)
@@ -221,7 +250,7 @@ five distinct widths regardless of prior state.
 
 This project is licensed per file:
 
-- `24dots` -- GNU GPL v3 or later
+- `24dots` and `24dots_functions.sh` -- GNU GPL v3 or later
 - `output.jpg` -- Creative Commons Attribution-ShareAlike 4.0
 - `README.md` (this file) -- GNU Free Documentation License 1.3
 
