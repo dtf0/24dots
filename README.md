@@ -243,6 +243,7 @@ which lists the names if defined.
 - Epson LQ-590II User's Guide (NPD5799-02 EN)
   - https://files.support.epson.com/pdf/lq590ii/lq590iiug.pdf
 - ESC/P 2 reference (pp. 156-157 of the user's guide)
+  - Detailed: [EPSON ESC/P Reference Manual](https://files.support.epson.com/pdf/general/escp2ref.pdf)
 - `foomatic-db-compressed-ppds` package for the LQ-2550 Foomatic PPD (used for
   graphical PDF printing through a separate filtered queue)
 
