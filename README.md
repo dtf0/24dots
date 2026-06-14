@@ -216,3 +216,24 @@ five distinct widths regardless of prior state.
 - ESC/P 2 reference (pp. 156-157 of the user's guide)
 - `foomatic-db-compressed-ppds` package for the LQ-2550 Foomatic PPD (used for
   graphical PDF printing through a separate filtered queue)
+
+## Licence
+
+This project is licensed per file:
+
+- `24dots` -- GNU GPL v3 or later
+- `output.jpg` -- Creative Commons Attribution-ShareAlike 4.0
+- `README.md` (this file) -- GNU Free Documentation License 1.3
+
+Full per-file licensing is recorded in [COPYING](COPYING), in the
+machine-readable Debian copyright format.  Licence texts are in the
+`LICENSES/` directory.
+
+---
+
+Copyright (C)  2026  Dillon Feeney.  Permission is granted to copy,
+distribute and/or modify this document under the terms of the GNU Free
+Documentation License, Version 1.3 or any later version published by
+the Free Software Foundation; with no Invariant Sections, no
+Front-Cover Texts, and no Back-Cover Texts.  A copy of the licence is
+in LICENSES/GFDL-1.3-no-invariants-only.txt.
