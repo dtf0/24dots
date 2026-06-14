@@ -211,16 +211,16 @@ five distinct widths regardless of prior state.
 
 ## `24dots_functions.sh`
 
-Printing helpers (ESC/P + CUPS).  Require `$PRINTER` to name a valid lp
-destination.  Source this file from ~/.bashrc (or ~/.profile) to load:
+Printing helpers (ESC/P + CUPS).  Requires `$PRINTER` to name a valid lp
+destination.  Source this file from `~/.bashrc` (or `~/.profile`) to load:
 ```sh
-[ -f ~/.shell_functions ] && . ~/.shell_functions
+[ -f /path/to/24dots_functions.sh ] && . /path/to/24dots_functions.sh
 ```
-Both functions depend on: fmt, lp (CUPS).  print_explicit assumes the target
-printer understands ESC/P control codes.
+Both functions depend on: `fmt`, `lp` (CUPS).  `24dots_explicit` assumes the
+target printer understands ESC/P control codes.
 
 Notes:
-Define $PRINTER before or alongside these functions, for example:
+Define `$PRINTER` before or alongside these functions, for example:
 ```sh
 export PRINTER=office
 ```
@@ -234,7 +234,7 @@ or open a new shell.
 
 Confirm loading with:
 ```sh
-declare -F print_panel print_explicit
+declare -F 24dots_panel 24dots_explicit
 ```
 which lists the names if defined.
 

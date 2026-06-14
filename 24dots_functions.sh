@@ -21,7 +21,7 @@
 # ---------------------------------------------------------------------------
 # Printing helpers (ESC/P + CUPS).  Require `$PRINTER` to name a valid lp
 # destination.  Source this file from ~/.bashrc (or ~/.profile) to load:
-#   `[ -f ~/.shell_functions ] && . ~/.shell_functions`
+#   `[ -f /path/to/24dots_functions.sh ] && . /path/to/24dots_functions.sh`
 # Both functions depend on: fmt, lp (CUPS).  print_explicit assumes the
 # target printer understands ESC/P control codes.
 # ---------------------------------------------------------------------------
@@ -30,9 +30,9 @@
 #   `export PRINTER=office`
 # in the same file or in your environment setup.  After editing the sourced
 # file, reload it with:
-#   `. path/to/24dots_functions.sh`
+#   `. /path/to/24dots_functions.sh`
 # or open a new shell.  Confirm loading with:
-#   `declare -F print_panel print_explicit`
+#   `declare -F 24dots_panel 24dots_explicit`
 # which lists the names if defined.
 # ---------------------------------------------------------------------------
 
